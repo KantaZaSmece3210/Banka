@@ -1,0 +1,367 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+//struct Client
+//{
+//    int AcctNum;
+//    char FirstName[20];
+//    char LastName[20];
+//    double balance;
+//};
+//
+//typedef struct Client Client;
+//
+//void print_client_to_stdout(Client s)
+//{
+//     fprintf(stdout,"%5d %20s %20s %15lf\n",s.AcctNum,s.FirstName,s.LastName,s.balance);
+//}
+//
+//void print_all_clients_to_stdout(FILE*f)
+//{
+//    Client s;
+//
+//    fseek(f,0,SEEK_SET);
+//
+//     fprintf(stdout, "%5s %20s %20s %15s\n", "ID", "First name", "Last name", "Balance");
+//
+//    while(fread(&s,sizeof(Client),1,f))
+//        print_client_to_stdout(s);
+//
+//        printf("\n");
+//
+//}
+//
+//void add_client_to_database(Client s, FILE*f)
+//{
+//    int n = 1;
+//
+//     fseek(f, 0, SEEK_SET);
+//
+//    Client temp;
+//
+//    while (n != s.AcctNum)
+//    {
+//        if(feof(f))
+//            break;
+//
+//        fread(&temp,sizeof(Client),1,f);
+//        n++;
+//    }
+//
+//    Client Empty = {0,"","",0};
+//
+//    while (n != s.AcctNum)
+//    {
+//       fwrite(&Empty,sizeof(Client),1,f);
+//       n++;
+//    }
+//
+//    fseek(f,sizeof(Client)*(s.AcctNum-1),SEEK_SET);
+//    fwrite(&s,sizeof(Client),1,f);
+//
+//    printf("\n");
+//}
+//
+//int number_of_clients(FILE*f)
+//{
+//    fseek(f,0,SEEK_END);
+//
+//    return ftell(f) / sizeof(Client);
+//}
+//
+//void delete_client(int id, FILE*f)
+//{
+//    int len = number_of_clients(f);
+//
+//    if(id > len)
+//    {
+//        fprintf(stdout,"Accout ID does not exist!\n\n");
+//        return 1;
+//    }
+//
+//    Client Empty = {0,"","",0};
+//
+//    fseek(f,sizeof(Client)*(id-1),SEEK_SET);
+//
+//    fwrite(&Empty,sizeof(Client),1,f);
+//}
+//
+//Client get_Client()
+//{
+//    Client* r = malloc(sizeof(Client));
+//
+//    printf("Enter ID: ");
+//    fscanf(stdin,"%d",&(r->AcctNum));
+//
+//     printf("Enter First Name: ");
+//    fscanf(stdin,"%s",&(r->FirstName));
+//
+//     printf("Enter Last Name: ");
+//    fscanf(stdin,"%s",&(r->LastName));
+//
+//     printf("Enter balance: ");
+//    fscanf(stdin,"%lf",&(r->balance));
+//
+//    return *r;
+//}
+//
+//void menu(FILE*f)
+//{
+//
+//    while(1)
+//    {
+//    printf("Enter the number of option you want to choose: \n");
+//    printf("1. Print all clients\n");
+//    printf("2. Add a client\n");
+//    printf("3. Delete a client \n");
+//    printf("4.Exit\n\n");
+//
+//    int n;
+//
+//    scanf("%d",&n);
+//    Client c;
+//    int id;
+//
+//    switch(n)
+//    {
+//        case 1:
+//            print_all_clients_to_stdout(f);
+//            break;
+//        case 2:
+//            c = get_Client();
+//            add_client_to_database(c,f);
+//            break;
+//        case 3:
+//            id;
+//            printf("Enter Account ID: ");
+//            scanf("%d",&id); printf("\n");
+//            delete_client(id,f);
+//            break;
+//        case 4:
+//            return 0;
+//    }
+//    }
+//}
+
+struct Client
+{
+    int broj_racuna;
+    char ime[20];
+    char prezime[20];
+    double stanje;
+};
+
+typedef struct Client Klijent;
+
+void prikaz_klijenta(Klijent s)
+{
+    fprintf(stdout, "%5d %20s %20s %15.2lf\n", s.broj_racuna,s.ime,s.prezime,s.stanje);
+}
+
+void prikaz_svih_klijenata(FILE*f)
+{
+    fseek(f,0,SEEK_SET);
+
+    fprintf(stdout, "%5s %20s %20s %15s\n", "ID", "Ime: ", "Prezime: ", "Stanje: ");
+
+    Klijent s;
+
+    while(fread(&s,sizeof(Klijent),1,f))
+        prikaz_klijenta(s);
+
+    printf("\n");
+}
+
+void dodati_klijenta(Klijent s, FILE*f)
+{
+    fseek(f,0,SEEK_SET);
+
+    int n = 1;
+
+    Klijent pom;
+
+    while(n != s.broj_racuna)
+    {
+        if(feof(f))
+            break;
+
+        fread(&pom,sizeof(Klijent),1,f);
+
+        n++;
+    }
+
+    Klijent temp = {0,"","",0};
+
+    while(n != s.broj_racuna)
+    {
+        fwrite(&temp,sizeof(Klijent),1,f);
+        n++;
+    }
+
+    fseek(f,sizeof(Klijent)*(s.broj_racuna-1),SEEK_SET);
+    fwrite(&s,sizeof(Klijent),1,f);
+
+    printf("\n");
+}
+
+Klijent kreirati_nalog()
+{
+    Klijent* s = malloc(sizeof(Klijent));
+
+    printf("Unijeti broj racuna: ");
+    fscanf(stdin,"%d",&(s->broj_racuna));
+
+    printf("Unijeti ime: ");
+    fscanf(stdin,"%s",&(s->ime));
+
+    printf("Unijeti prezime: ");
+    fscanf(stdin,"%s",&(s->prezime));
+
+    printf("Unijeti stanje na racunu: ");
+    fscanf(stdin,"%lf",&(s->stanje));
+
+    return *s;
+}
+
+int broj_naloga(FILE*f)
+{
+    fseek(f,0,SEEK_END);
+
+    return ftell(f) / sizeof(Klijent);
+}
+
+void obrisati_klijenta(int id,FILE*f)
+{
+    int duzina = broj_naloga(f);
+
+    if(id > broj_naloga)
+    {
+        fprintf(stdout,"Ne postoji klijent sa datim brojem racuna.");
+        return 1;
+    }
+
+    Klijent prazan = {0,"","",0};
+
+    fseek(f,sizeof(Klijent)*(id-1),SEEK_SET);
+    fwrite(&prazan,sizeof(Klijent),1,f);
+
+    printf("\n");
+}
+
+void azurirati_nalog(FILE*f)
+{
+
+    printf("1. Podici novac sa racuna\n");
+    printf("2. Uplatiti novac na racunu\n\n");
+
+    int x;
+
+    fscanf(stdin,"%d",&x);
+
+    if(x == 1)
+    {
+        int id;
+        double suma;
+        Klijent pom;
+
+        printf("Unijeti broj racuna: ");
+        scanf("%d",&id); printf("\n");
+
+        fseek(f,sizeof(Klijent)*(id-1),SEEK_SET);
+        fread(&pom,sizeof(Klijent),1,f);
+
+        if( id > broj_naloga(f) || pom.broj_racuna == 0 )
+        {
+            printf("Nalog sa datim brojem racuna ne postoji.\n\n");
+            return 1;
+        }
+
+        printf("Unijeti sumu novca koju zelite podici: ");
+        scanf("%lf",&suma); printf("\n");
+
+        if(pom.stanje - suma < 0)
+        {
+            printf("Nemate dovoljno novca na racunu.\n\n");
+            return 1;
+        }
+
+        else
+        {
+            pom.stanje -= suma;
+            fseek(f,sizeof(Klijent)*(id-1),SEEK_SET);
+
+            fwrite(&pom,sizeof(Klijent),1,f);
+        }
+
+    }
+
+    else
+    {
+        int id;
+        double suma;
+
+        Klijent pom;
+
+        printf("Unijeti broj racuna: ");
+        scanf("%d",&id); printf("\n");
+
+        fseek(f,sizeof(Klijent)*(id-1),SEEK_SET);
+        fread(&pom,sizeof(Klijent),1,f);
+
+        if( id > broj_naloga(f) || pom.broj_racuna == 0 )
+        {
+            printf("Nalog sa datim brojem racuna ne postoji.\n\n");
+            return 1;
+        }
+
+        printf("Unijeti sumu novca koju zelite uplatiti: ");
+        scanf("%lf",&suma); printf("\n");
+
+        pom.stanje += suma;
+        fseek(f,sizeof(Klijent)*(id-1),SEEK_SET);
+
+        fwrite(&pom,sizeof(Klijent),1,f);
+
+}
+}
+
+void opcije(FILE*f)
+{
+    while(1)
+    {
+        printf("1. Prikaz svih klijenata\n");
+        printf("2. Dodati klijenta \n");
+        printf("3. Obrisati klijenta\n");
+        printf("4. Azurirati racun\n");
+        printf("5. Napustiti aplikaciju\n");
+
+        printf("\nUnijeti broj opcije koju zelite odabrati: ");
+        int n,id;   scanf("%d",&n);  printf("\n");
+
+        Klijent s;
+
+        switch(n)
+        {
+            case 1:
+                prikaz_svih_klijenata(f);
+                break;
+            case 2:
+                s = kreirati_nalog();
+                dodati_klijenta(s,f);
+                break;
+            case 3:
+                printf("\nUnijeti id: ");
+                scanf("%d",&id);
+
+                obrisati_klijenta(id,f);
+                break;
+            case 4:
+                azurirati_nalog(f);
+                break;
+            case 5:
+                return 0;
+        }
+    }
+}
+
+
